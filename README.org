@@ -1,14 +1,22 @@
 #+TITLE: Liquid Neural Networks
-#+AUTHOR: 
+#+AUTHOR: Aidan Pace
 #+DATE: 2025-01-17
 #+PROPERTY: header-args :tangle yes
 #+PROPERTY: header-args :mkdirp yes
 #+PROPERTY: header-args :comments link
 #+OPTIONS: toc:2 num:nil ^:nil
 
+[[https://github.com/aygp-dr/liquid-neural-networks/actions/workflows/ci.yml][https://github.com/aygp-dr/liquid-neural-networks/actions/workflows/ci.yml/badge.svg]]
+[[https://github.com/aygp-dr/liquid-neural-networks/blob/main/LICENSE][https://img.shields.io/badge/license-MIT-blue.svg]]
+[[https://clojars.org/liquid-neural-networks][https://img.shields.io/clojars/v/liquid-neural-networks.svg]]
+[[https://pypi.org/project/liquid-neural-networks/][https://img.shields.io/pypi/v/liquid-neural-networks.svg]]
+[[https://github.com/aygp-dr/liquid-neural-networks][https://img.shields.io/badge/python-3.9+-blue.svg]]
+[[https://github.com/aygp-dr/liquid-neural-networks][https://img.shields.io/badge/clojure-1.11+-blue.svg]]
+[[https://codecov.io/gh/aygp-dr/liquid-neural-networks][https://codecov.io/gh/aygp-dr/liquid-neural-networks/branch/main/graph/badge.svg]]
+
 * Overview
 
-A hybrid Python/Clojure implementation of Liquid Neural Networks.
+A hybrid Python/Clojure implementation of Liquid Neural Networks (LNNs) - continuous-time neural architectures inspired by biological neurons in C. elegans. This project provides parameter-efficient AI models that can solve complex tasks with as few as 19-302 neurons, offering superior interpretability and real-time adaptation capabilities.
 
 * Setup
 
@@ -171,4 +179,32 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+#+end_src
+
+* License
+
+This project is licensed under the MIT License - see below for details:
+
+#+begin_src text :tangle LICENSE
+MIT License
+
+Copyright (c) 2025 Aidan Pace
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 #+end_src
