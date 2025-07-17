@@ -73,3 +73,11 @@ watch:
 check-org:
 	@emacs --batch --eval "(require 'org)" --eval "(princ (org-version))" || \
 		(echo "Error: Emacs org-mode not found" && exit 1)
+
+# Generate README.md from README.org
+README.md: README.org
+	@echo "Generating README.md from README.org..."
+	@emacs --batch --eval "(require 'org)" \
+		--eval "(require 'ox-md)" \
+		--eval "(with-current-buffer (find-file-noselect \"$<\") (org-md-export-to-markdown))"
+	@echo "✓ README.md generated"

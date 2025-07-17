@@ -39,3 +39,6 @@ pom.xml.asc
 # OS
 .DS_Store
 Thumbs.db
+
+# Generated files
+README.md
