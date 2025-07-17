@@ -20,8 +20,19 @@ help:
 tangle:
 	@echo "Tangling SETUP.org..."
 	@emacs --batch --eval "(require 'org)" \
+		--eval "(setq org-babel-tangle-comment-format-beg \"\")" \
+		--eval "(setq org-babel-tangle-comment-format-end \"\")" \
 		--eval "(org-babel-tangle-file \"SETUP.org\")"
 	@echo "✓ Tangling complete"
+
+# Tangle README.org separately
+tangle-readme:
+	@echo "Tangling README.org..."
+	@emacs --batch --eval "(require 'org)" \
+		--eval "(setq org-babel-tangle-comment-format-beg \"\")" \
+		--eval "(setq org-babel-tangle-comment-format-end \"\")" \
+		--eval "(org-babel-tangle-file \"README.org\")"
+	@echo "✓ README tangling complete"
 
 # Detangle - extract code changes back to SETUP.org
 detangle:
