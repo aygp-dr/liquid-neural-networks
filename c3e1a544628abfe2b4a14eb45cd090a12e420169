@@ -1,0 +1,36 @@
+## Prompts Used
+
+1. Initialize this as a Clojure project and set up with uv for Python
+   - Intent: Create a hybrid project supporting both Python and Clojure development
+   - Result: Established dual-language project structure with respective package managers
+
+2. Use org-mode consistently with specified properties for literate programming
+   - Intent: Enable tangling and proper org-mode configuration for documentation
+   - Properties added: header-args for tangle, mkdirp, comments link
+   - Options: toc:2, no numbering, no sub/superscript interpretation
+
+## Testing Notes
+
+### Python Testing
+- Run: `uv venv && source .venv/bin/activate && uv pip install -e .`
+- Test main: `python -m liquid_neural_networks.core`
+- Verify greeting function works with arguments
+
+### Clojure Testing
+- Run REPL: `clojure -M:dev`
+- Test main: `clojure -M -m liquid-neural-networks.core`
+- Verify namespace loads correctly
+
+## Repository Rebuild Instructions
+
+1. Clone repository
+2. For Python: `uv venv && source .venv/bin/activate && uv pip install -e .`
+3. For Clojure: Dependencies auto-download on first run
+4. Tangle org files if needed: `emacs --batch -l org --eval "(org-babel-tangle-file \"README.org\")"`
+
+## Architecture Decisions
+
+- Chose uv for Python: Modern, fast package manager with better dependency resolution
+- deps.edn for Clojure: Standard tooling, supports aliases for dev/test/build workflows
+- Org-mode documentation: Enables literate programming and unified documentation approach
+- Separate source directories: Clear separation between languages while sharing resources
