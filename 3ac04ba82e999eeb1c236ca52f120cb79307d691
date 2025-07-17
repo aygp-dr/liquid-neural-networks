@@ -1,0 +1,47 @@
+## Prompts Used
+
+1. Mark the release and note that the status of this project is in progress / draft
+   - Intent: Create initial release to mark project foundation
+   - Action: Created v0.1.0 tag and GitHub pre-release with comprehensive notes
+
+2. Add notes on the prompts per previous instruction
+   - Intent: Document the development process for future reference
+   - Action: Adding this git note to track prompts used
+
+## Testing Notes
+
+### Release Process
+- Created annotated tag v0.1.0 with detailed release notes
+- Published GitHub release marked as pre-release
+- Added status badges to README: draft status and v0.1.0 release
+- Included prominent notice about early development stage
+
+### Project Status Indicators
+- Orange "draft" badge in README
+- Pre-release flag on GitHub release
+- Clear notice in Overview section
+- Detailed known issues and next steps in release notes
+
+## Repository Rebuild Instructions
+
+1. Clone repository at v0.1.0 tag: `git clone --branch v0.1.0 <repo-url>`
+2. Project foundation is established but no LNN implementation yet
+3. Use org-mode tangling for configuration: `make tangle`
+4. README.md can be generated with: `gmake README.md`
+
+## Architecture Decisions
+
+- Used semantic versioning starting at v0.1.0
+- Marked as pre-release to indicate draft status
+- Documented known issues transparently
+- Set clear expectations about project maturity
+- Provided roadmap in release notes for transparency
+
+## Development Process
+
+This initial release captures the project setup phase where:
+- Two AI agents collaborated on the initial structure
+- One agent created COMPREHENSIVE.org with extensive setup
+- Second agent cleaned up and made it production-ready
+- Build artifacts were preserved as documentation
+- Clear separation between developer docs (SETUP.org) and user docs (README.org)
