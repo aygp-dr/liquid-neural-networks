@@ -1,0 +1,174 @@
+#+TITLE: Liquid Neural Networks
+#+AUTHOR: 
+#+DATE: 2025-01-17
+#+PROPERTY: header-args :tangle yes
+#+PROPERTY: header-args :mkdirp yes
+#+PROPERTY: header-args :comments link
+#+OPTIONS: toc:2 num:nil ^:nil
+
+* Overview
+
+A hybrid Python/Clojure implementation of Liquid Neural Networks.
+
+* Setup
+
+** Python (using uv)
+
+#+begin_src bash :tangle no
+uv venv
+source .venv/bin/activate  # On Unix/macOS
+# or
+.venv\Scripts\activate  # On Windows
+uv pip install -e .
+#+end_src
+
+** Clojure
+
+#+begin_src bash :tangle no
+# Run REPL
+clojure -M:dev
+
+# Run tests
+clojure -M:test
+
+# Run main
+clojure -M -m liquid-neural-networks.core
+#+end_src
+
+* Project Structure
+
+- =src/= - Python source code
+- =src/clj/= - Clojure source code
+- =test/= - Tests for both languages
+- =resources/= - Shared resources
+
+* Configuration Files
+
+** Python Project Configuration (pyproject.toml)
+
+#+begin_src toml :tangle pyproject.toml
+[project]
+name = "liquid-neural-networks"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.org"
+requires-python = ">=3.12"
+dependencies = []
+#+end_src
+
+** Clojure Dependencies (deps.edn)
+
+#+begin_src clojure :tangle deps.edn
+{:paths ["src/clj" "resources"]
+ :deps {org.clojure/clojure {:mvn/version "1.11.1"}
+        org.clojure/core.async {:mvn/version "1.6.681"}
+        org.clojure/data.json {:mvn/version "2.4.0"}}
+ :aliases
+ {:dev {:extra-paths ["dev" "test"]
+        :extra-deps {nrepl/nrepl {:mvn/version "1.0.0"}
+                     cider/cider-nrepl {:mvn/version "0.30.0"}}}
+  :test {:extra-paths ["test"]
+         :extra-deps {lambdaisland/kaocha {:mvn/version "1.87.1366"}}
+         :main-opts ["-m" "kaocha.runner"]}
+  :build {:deps {io.github.clojure/tools.build {:mvn/version "0.9.6"}}
+          :ns-default build}}}
+#+end_src
+
+** Git Ignore Configuration
+
+#+begin_src gitignore :tangle .gitignore
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv
+.uv/
+*.egg-info/
+dist/
+build/
+
+# Clojure
+/target
+/classes
+/checkouts
+profiles.clj
+pom.xml
+pom.xml.asc
+*.jar
+*.class
+/.lein-*
+/.nrepl-port
+/.cpcache
+/.clj-kondo
+/.lsp
+
+# IDE
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+#+end_src
+
+* Source Code
+
+** Clojure Core Module
+
+#+begin_src clojure :tangle src/clj/liquid_neural_networks/core.clj
+(ns liquid-neural-networks.core)
+
+(defn greet
+  "Returns a greeting message"
+  [name]
+  (str "Hello, " name "! Welcome to Liquid Neural Networks."))
+
+(defn -main
+  "Main entry point"
+  [& args]
+  (println (greet (or (first args) "World"))))
+#+end_src
+
+** Python Module
+
+#+begin_src python :tangle src/liquid_neural_networks/__init__.py
+"""Liquid Neural Networks - A Python/Clojure hybrid implementation."""
+
+__version__ = "0.1.0"
+#+end_src
+
+#+begin_src python :tangle src/liquid_neural_networks/core.py
+"""Core module for Liquid Neural Networks."""
+
+
+def greet(name: str = "World") -> str:
+    """Return a greeting message.
+    
+    Args:
+        name: Name to greet
+        
+    Returns:
+        Greeting message
+    """
+    return f"Hello, {name}! Welcome to Liquid Neural Networks."
+
+
+def main() -> None:
+    """Main entry point."""
+    import sys
+    name = sys.argv[1] if len(sys.argv) > 1 else "World"
+    print(greet(name))
+
+
+if __name__ == "__main__":
+    main()
+#+end_src
