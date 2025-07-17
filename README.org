@@ -6,13 +6,13 @@
 #+PROPERTY: header-args :comments link
 #+OPTIONS: toc:2 num:nil ^:nil
 
-[[https://github.com/aygp-dr/liquid-neural-networks/actions/workflows/ci.yml][https://github.com/aygp-dr/liquid-neural-networks/actions/workflows/ci.yml/badge.svg]]
 [[https://github.com/aygp-dr/liquid-neural-networks/blob/main/LICENSE][https://img.shields.io/badge/license-MIT-blue.svg]]
-[[https://clojars.org/liquid-neural-networks][https://img.shields.io/clojars/v/liquid-neural-networks.svg]]
-[[https://pypi.org/project/liquid-neural-networks/][https://img.shields.io/pypi/v/liquid-neural-networks.svg]]
 [[https://github.com/aygp-dr/liquid-neural-networks][https://img.shields.io/badge/python-3.9+-blue.svg]]
 [[https://github.com/aygp-dr/liquid-neural-networks][https://img.shields.io/badge/clojure-1.11+-blue.svg]]
-[[https://codecov.io/gh/aygp-dr/liquid-neural-networks][https://codecov.io/gh/aygp-dr/liquid-neural-networks/branch/main/graph/badge.svg]]
+[[https://github.com/aygp-dr/liquid-neural-networks][https://img.shields.io/github/languages/top/aygp-dr/liquid-neural-networks]]
+[[https://github.com/aygp-dr/liquid-neural-networks][https://img.shields.io/github/repo-size/aygp-dr/liquid-neural-networks]]
+[[https://github.com/aygp-dr/liquid-neural-networks/commits/main][https://img.shields.io/github/last-commit/aygp-dr/liquid-neural-networks]]
+[[https://github.com/aygp-dr/liquid-neural-networks/issues][https://img.shields.io/github/issues/aygp-dr/liquid-neural-networks]]
 
 * Overview
 
