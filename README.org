@@ -6,8 +6,14 @@
 [[https://github.com/aygp-dr/liquid-neural-networks/blob/main/LICENSE][https://img.shields.io/badge/license-MIT-blue.svg]]
 [[https://github.com/aygp-dr/liquid-neural-networks][https://img.shields.io/badge/python-3.9+-blue.svg]]
 [[https://github.com/aygp-dr/liquid-neural-networks][https://img.shields.io/badge/clojure-1.11+-blue.svg]]
+[[https://github.com/aygp-dr/liquid-neural-networks][https://img.shields.io/badge/status-draft-orange.svg]]
+[[https://github.com/aygp-dr/liquid-neural-networks/releases][https://img.shields.io/badge/release-v0.1.0-blue.svg]]
 
 * Overview
+
+*🚧 Project Status: Draft/In Progress*
+
+This project is in early development. Core algorithms and implementations are being actively developed.
 
 Liquid Neural Networks (LNNs) are a revolutionary approach to artificial intelligence that draws inspiration from biological neural systems, particularly the C. elegans nervous system. Unlike traditional neural networks, LNNs use continuous-time dynamics and can adapt in real-time to changing inputs.
 
