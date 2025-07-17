@@ -1,0 +1,36 @@
+## Prompts Used
+
+1. Update COMPREHENSIVE.org so it won't tangle to root filesystem
+   - Intent: Prevent accidental system file modifications during tangling
+   - Action: Convert all absolute paths to relative project paths
+
+2. Fix formatting issues while keeping corruption artifact
+   - Intent: Make file usable while preserving build process artifact for later fix
+   - Action: Added proper org-mode headers, closed unclosed blocks, marked corruption
+
+## Testing Notes
+
+### Tangle Safety
+- All tangle directives now use relative paths
+- System config examples use :tangle config/sysctl.conf.example with :mkdirp yes
+- No risk of writing to /etc or other system directories
+
+### File Structure
+- Added proper #+TITLE, #+AUTHOR, #+DATE headers
+- Set consistent header-args properties for tangling
+- Closed the unclosed #+BEGIN_SRC block at line 2364
+- Added comment noting corruption artifact for future cleanup
+
+## Repository Rebuild Instructions
+
+1. The corruption artifact at end of file is intentional - part of build process
+2. When tangling COMPREHENSIVE.org, ensure mkdirp is supported
+3. All tangled files will be created relative to project root
+4. System configurations are examples only - manual copy required for actual use
+
+## Architecture Decisions
+
+- Used org-mode source blocks for all configuration files
+- Leveraged :mkdirp yes to auto-create directories
+- Kept all tangle targets within project directory structure
+- Preserved build artifact as documentation of process issues
