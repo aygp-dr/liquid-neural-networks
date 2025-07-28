@@ -1,0 +1,40 @@
+Context and Details for CI/CD and Dependency Management
+
+BACKGROUND:
+User requested verification that GitHub Actions work and that 'gmake deps' is sane.
+Discovered no existing CI and dependency management issues.
+
+ISSUES ENCOUNTERED:
+1. No existing GitHub Actions workflows
+2. requirements.txt contained heavy ML dependencies not available on FreeBSD
+3. PyTorch, TensorFlow compilation failed on FreeBSD
+4. Missing gmake deps target
+
+CHANGES MADE:
+1. Created .github/workflows/ci.yml with comprehensive CI pipeline
+2. Added requirements-minimal.txt with platform-compatible dependencies
+3. Added 'deps' and 'install' targets to Makefile
+4. Updated help text to document new targets
+
+CI PIPELINE FEATURES:
+- Matrix testing across Python 3.9, 3.10, 3.11
+- Separate jobs for Python and Clojure testing
+- Lint checks with ruff and black
+- Smoke tests to verify basic functionality
+- Platform compatibility (Ubuntu for CI)
+
+DEPENDENCY STRATEGY:
+- Minimal requirements for core functionality
+- Optional heavy dependencies commented out
+- Platform-aware dependency management
+- Graceful failure handling for missing dependencies
+
+EXPERIMENTS:
+1. Tested scipy installation - too slow on FreeBSD (compilation required)
+2. Verified core functionality works with minimal dependencies
+3. CI pipeline designed to catch basic issues without heavy dependencies
+
+FOLLOW-UP:
+- CI will run on next push to verify functionality
+- Consider adding badges to README
+- May need platform-specific requirements files for different deployment targets
