@@ -1,0 +1,40 @@
+Context and Details for Dependency Management
+
+BACKGROUND:
+Complex Clojure dependency chain was preventing basic functionality.
+Multiple scientific computing libraries had unresolvable version conflicts.
+
+ISSUES ENCOUNTERED:
+1. scicloj:notespace:jar:4.0.0-beta7 not found in central repository
+2. scicloj:dtype-next:jar:10.104.0 missing from central
+3. Circular dependency issues with tablecloth -> dtype-next chain
+4. Matrix computation libraries (core.matrix, vectorz-clj) also problematic
+5. Scientific computing stack (fastmath, tech.ml) dependent on broken chain
+
+CHANGES MADE:
+1. Commented out scicloj/notespace (visualization dependency)
+2. Commented out scicloj/dtype-next and dependent libraries
+3. Commented out scicloj/tablecloth and tech.ml
+4. Temporarily disabled matrix computation libraries
+5. Kept core Clojure libraries and basic functionality
+6. Added explanatory comments for each disabled dependency
+
+EXPERIMENTS:
+1. Tried selective dependency removal - still failed
+2. Attempted version downgrades - repositories missing entirely
+3. Complete removal of scicloj ecosystem - SUCCESS
+
+HYPOTHESIS:
+The scicloj ecosystem appears to be in transition or has repository issues.
+For basic LNN development, we can start with core Clojure and add dependencies incrementally.
+
+DEVIATIONS:
+- Originally intended to have full scientific computing stack
+- Had to fall back to minimal viable dependency set
+- This enables development to proceed while dependency issues are resolved
+
+FOLLOW-UP:
+- Research current scicloj ecosystem status
+- Consider alternative matrix/scientific libraries (Neanderthal, etc.)
+- Re-enable dependencies once repository issues are resolved
+- May need to switch to different Clojure ML ecosystem
