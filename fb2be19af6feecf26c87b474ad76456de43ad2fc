@@ -1,0 +1,34 @@
+Context and Details for UV Integration
+
+BACKGROUND:
+User pointed out that raw pip install is inefficient and we should use uv.
+UV is a fast Python package installer and resolver written in Rust.
+
+ISSUES IDENTIFIED:
+1. pip install was slow, especially for packages requiring compilation
+2. Traditional pip workflows are inefficient for development
+3. CI/CD could benefit from faster dependency resolution
+
+CHANGES MADE:
+1. Updated Makefile deps target to use 'uv pip install'
+2. Updated install target to use 'uv pip install -e .'
+3. Modified GitHub Actions CI to install uv first
+4. Updated all three CI jobs to use uv consistently
+
+BENEFITS:
+- Significantly faster dependency resolution and installation
+- Better caching and parallel downloads
+- More reliable dependency solving
+- Modern Python tooling approach
+
+EXPERIMENTS:
+Testing showed uv still needs to compile scipy on FreeBSD, but resolution is much faster.
+This is a platform limitation, not a uv issue.
+
+DEVIATIONS:
+None - this is a pure improvement over traditional pip workflow.
+
+FOLLOW-UP:
+- Consider adding uv.lock file for deterministic builds
+- May want to explore uv's virtual environment management
+- CI should be much faster with uv
