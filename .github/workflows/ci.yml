@@ -21,10 +21,12 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     
+    - name: Install uv
+      run: pip install uv
+        
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
-        pip install numpy scipy matplotlib pytest black ruff
+        uv pip install numpy scipy matplotlib pytest black ruff
         # Skip heavy ML dependencies for CI
         
     - name: Lint with ruff
@@ -91,10 +93,10 @@ jobs:
       with:
         cli: latest
         
-    - name: Install basic dependencies
+    - name: Install uv and basic dependencies
       run: |
-        python -m pip install --upgrade pip
-        pip install numpy scipy matplotlib
+        pip install uv
+        uv pip install numpy scipy matplotlib
         
     - name: Run smoke tests
       run: |

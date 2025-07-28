@@ -127,14 +127,13 @@ smoke-test: tangle
 # Dependency management
 deps:
 	@echo "Installing dependencies..."
-	@echo "Checking Python dependencies..."
-	@python -m pip install --upgrade pip
-	@pip install -r requirements-minimal.txt || echo "requirements-minimal.txt not found or issues"
+	@echo "Checking Python dependencies with uv..."
+	@uv pip install -r requirements-minimal.txt || echo "requirements-minimal.txt not found or issues"
 	@echo "Checking Clojure dependencies..."
 	@clojure -M -e "(println \"Clojure dependencies check completed\")" || echo "Clojure dependency issues - see deps.edn"
 	@echo "✓ Dependencies check completed"
 
 install: deps
 	@echo "Installing project in development mode..."
-	@pip install -e . || echo "Python package installation failed"
+	@uv pip install -e . || echo "Python package installation failed"
 	@echo "✓ Installation completed"
