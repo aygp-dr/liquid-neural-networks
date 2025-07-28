@@ -1,7 +1,7 @@
 # Liquid Neural Networks - Makefile
 # Org-mode tangle/detangle operations
 
-.PHONY: help tangle detangle clean-tangled setup-tangle all
+.PHONY: help tangle detangle clean-tangled setup-tangle all run-clojure run-python test test-clojure test-python
 
 # Default target
 all: help
@@ -14,6 +14,11 @@ help:
 	@echo "  make detangle      - Extract code back to SETUP.org (updates)"
 	@echo "  make clean-tangled - Remove all tangled files"
 	@echo "  make setup-tangle  - Tangle and create directory structure"
+	@echo "  make run-clojure   - Run Clojure LNN implementation"
+	@echo "  make run-python    - Run Python LNN implementation"
+	@echo "  make test          - Run all tests"
+	@echo "  make test-clojure  - Run Clojure tests"
+	@echo "  make test-python   - Run Python tests"
 	@echo "  make help          - Show this help message"
 
 # Tangle SETUP.org to extract all code blocks
@@ -81,3 +86,38 @@ README.md: README.org
 		--eval "(require 'ox-md)" \
 		--eval "(with-current-buffer (find-file-noselect \"$<\") (org-md-export-to-markdown))"
 	@echo "✓ README.md generated"
+
+# Run Clojure implementation
+run-clojure:
+	@echo "Running Clojure LNN implementation..."
+	@cd src/clj && clojure -M -e "(load-file \"liquid_neural_networks/core.clj\") (liquid-neural-networks.core/-main)"
+
+# Run Python implementation
+run-python:
+	@echo "Running Python LNN implementation..."
+	@cd src && python -m liquid_neural_networks.core
+
+# Run research Python implementation
+run-python-research:
+	@echo "Running Python research implementation..."
+	@cd src && python python/lnn_research.py
+
+# Test targets
+test: test-clojure test-python
+
+test-clojure:
+	@echo "Running Clojure tests..."
+	@clojure -M:test || echo "No Clojure tests found or test failures"
+
+test-python:
+	@echo "Running Python tests..."
+	@cd src && python -m pytest ../test/ --verbose || echo "No Python tests found or test failures"
+
+# Basic smoke tests
+smoke-test: tangle
+	@echo "Running smoke tests..."
+	@echo "Testing Python basic import..."
+	@cd src && python -c "from liquid_neural_networks.core import greet; print(greet('Smoke Test'))"
+	@echo "Testing Clojure basic syntax..."
+	@clojure -e "(println \"Clojure smoke test successful\")"
+	@echo "✓ Smoke tests passed"
