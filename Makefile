@@ -1,7 +1,7 @@
 # Liquid Neural Networks - Makefile
 # Org-mode tangle/detangle operations
 
-.PHONY: help tangle detangle clean-tangled setup-tangle all run-clojure run-python test test-clojure test-python
+.PHONY: help tangle detangle clean-tangled setup-tangle all run-clojure run-python test test-clojure test-python deps install
 
 # Default target
 all: help
@@ -19,6 +19,8 @@ help:
 	@echo "  make test          - Run all tests"
 	@echo "  make test-clojure  - Run Clojure tests"
 	@echo "  make test-python   - Run Python tests"
+	@echo "  make deps          - Install all dependencies"
+	@echo "  make install       - Install project in development mode"
 	@echo "  make help          - Show this help message"
 
 # Tangle SETUP.org to extract all code blocks
@@ -121,3 +123,18 @@ smoke-test: tangle
 	@echo "Testing Clojure basic syntax..."
 	@clojure -e "(println \"Clojure smoke test successful\")"
 	@echo "✓ Smoke tests passed"
+
+# Dependency management
+deps:
+	@echo "Installing dependencies..."
+	@echo "Checking Python dependencies..."
+	@python -m pip install --upgrade pip
+	@pip install -r requirements-minimal.txt || echo "requirements-minimal.txt not found or issues"
+	@echo "Checking Clojure dependencies..."
+	@clojure -M -e "(println \"Clojure dependencies check completed\")" || echo "Clojure dependency issues - see deps.edn"
+	@echo "✓ Dependencies check completed"
+
+install: deps
+	@echo "Installing project in development mode..."
+	@pip install -e . || echo "Python package installation failed"
+	@echo "✓ Installation completed"

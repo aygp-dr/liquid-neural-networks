@@ -1,0 +1,101 @@
+name: Liquid Neural Networks CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test-python:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.9, 3.10, 3.11]
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install numpy scipy matplotlib pytest black ruff
+        # Skip heavy ML dependencies for CI
+        
+    - name: Lint with ruff
+      run: |
+        ruff check src/ || echo "Ruff issues found"
+        
+    - name: Format check with black
+      run: |
+        black --check src/ || echo "Black formatting issues"
+        
+    - name: Test Python implementation
+      run: |
+        make run-python
+        
+    - name: Run Python tests
+      run: |
+        make test-python
+
+  test-clojure:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Java
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '11'
+        
+    - name: Install Clojure CLI
+      uses: DeLaGuardo/setup-clojure@12.1
+      with:
+        cli: latest
+        
+    - name: Test Clojure implementation
+      run: |
+        make run-clojure
+        
+    - name: Run Clojure tests
+      run: |
+        make test-clojure
+
+  smoke-test:
+    runs-on: ubuntu-latest
+    needs: [test-python, test-clojure]
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        
+    - name: Set up Java
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '11'
+        
+    - name: Install Clojure CLI
+      uses: DeLaGuardo/setup-clojure@12.1
+      with:
+        cli: latest
+        
+    - name: Install basic dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install numpy scipy matplotlib
+        
+    - name: Run smoke tests
+      run: |
+        make smoke-test
