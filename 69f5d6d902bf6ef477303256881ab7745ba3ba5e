@@ -1,0 +1,40 @@
+Context and Details for Makefile Enhancement
+
+BACKGROUND:
+User requested 'gmake run-clojure', 'gmake run-python', and 'gmake test' targets.
+The existing Makefile only had org-mode tangle/detangle operations.
+
+ISSUES ENCOUNTERED:
+1. Initial Clojure implementation failed due to complex dependency chain issues
+2. deps.edn contained problematic dependencies (scicloj:notespace, dtype-next)
+3. Namespace loading issues with require vs load-file approaches
+4. Shell escaping problems with -Sdeps parameter in Makefile
+
+CHANGES MADE:
+1. Added .PHONY declarations for new targets
+2. Implemented run-clojure using direct file loading approach
+3. Implemented run-python using module execution
+4. Added comprehensive test targets (test, test-clojure, test-python)
+5. Added smoke-test target for basic functionality verification
+6. Updated help text to document all new targets
+
+EXPERIMENTS:
+1. Tried multiple approaches for Clojure namespace loading:
+   - require with classpath manipulation: Failed due to deps.edn
+   - -Sdeps parameter: Failed due to shell escaping
+   - load-file approach: SUCCESS - bypasses dependency issues
+
+2. Tested various classpath configurations:
+   - Global deps.edn caused issues
+   - Directory-specific execution worked
+   - Direct file loading proved most reliable
+
+DEVIATIONS:
+- Originally planned to use standard 'require' approach for Clojure
+- Had to fallback to load-file method due to dependency conflicts
+- This is acceptable for development but may need refinement for production
+
+FOLLOW-UP:
+- Clojure dependencies need cleanup for full require-based loading
+- Test directories need to be created with actual test files
+- Consider adding lint and typecheck targets as mentioned in project guidelines
