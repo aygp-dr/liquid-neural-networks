@@ -1,13 +1,77 @@
-{:paths ["src/clj" "resources"]
- :deps {org.clojure/clojure {:mvn/version "1.11.1"}
-        org.clojure/core.async {:mvn/version "1.6.681"}
-        org.clojure/data.json {:mvn/version "2.4.0"}}
+{:deps
+ {org.clojure/clojure {:mvn/version "1.12.0"}
+  org.clojure/core.async {:mvn/version "1.6.681"}
+  org.clojure/core.matrix {:mvn/version "0.63.0"}
+  org.clojure/core.match {:mvn/version "1.1.0"}
+  org.clojure/data.csv {:mvn/version "1.1.0"}
+  org.clojure/data.json {:mvn/version "2.5.0"}
+  org.clojure/data.xml {:mvn/version "0.2.0-alpha9"}
+  org.clojure/tools.logging {:mvn/version "1.3.0"}
+  org.clojure/tools.cli {:mvn/version "1.1.230"}
+  
+  ;; Matrix computation
+  net.mikera/vectorz-clj {:mvn/version "0.48.0"}
+  net.mikera/core.matrix {:mvn/version "0.63.0"}
+  
+  ;; Scientific computing
+  generateme/fastmath {:mvn/version "2.4.0"}
+  scicloj/dtype-next {:mvn/version "10.104.0"}
+  scicloj/tablecloth {:mvn/version "7.029.2"}
+  scicloj/tech.ml {:mvn/version "7.029.2"}
+  
+  ;; Visualization
+  metasoarous/oz {:mvn/version "2.0.0-alpha5"}
+  scicloj/notespace {:mvn/version "4.0.0-beta7"}
+  
+  ;; Web and API
+  ring/ring-core {:mvn/version "1.12.2"}
+  ring/ring-jetty-adapter {:mvn/version "1.12.2"}
+  compojure/compojure {:mvn/version "1.7.1"}
+  hiccup/hiccup {:mvn/version "1.0.5"}
+  
+  ;; Database
+  com.github.seancorfield/honeysql {:mvn/version "2.6.1147"}
+  com.github.seancorfield/next.jdbc {:mvn/version "1.3.939"}
+  org.postgresql/postgresql {:mvn/version "42.7.3"}
+  
+  ;; Testing
+  lambdaisland/kaocha {:mvn/version "1.91.1392"}
+  lambdaisland/kaocha-cloverage {:mvn/version "1.1.89"}
+  org.clojure/test.check {:mvn/version "1.1.1"}
+  
+  ;; Development tools
+  djblue/portal {:mvn/version "0.57.3"}
+  com.bhauman/rebel-readline {:mvn/version "0.1.4"}
+  cider/cider-nrepl {:mvn/version "0.50.2"}
+  
+  ;; System integration
+  babashka/fs {:mvn/version "0.5.22"}
+  babashka/process {:mvn/version "0.5.22"}
+  
+  ;; Async and concurrency
+  manifold/manifold {:mvn/version "0.4.3"}
+  aleph/aleph {:mvn/version "0.8.1"}}
+ 
  :aliases
- {:dev {:extra-paths ["dev" "test"]
-        :extra-deps {nrepl/nrepl {:mvn/version "1.0.0"}
-                     cider/cider-nrepl {:mvn/version "0.30.0"}}}
-  :test {:extra-paths ["test"]
-         :extra-deps {lambdaisland/kaocha {:mvn/version "1.87.1366"}}
+ {:dev {:extra-deps {org.clojure/tools.namespace {:mvn/version "1.5.0"}
+                     org.clojure/tools.trace {:mvn/version "0.7.11"}
+                     criterium/criterium {:mvn/version "0.4.6"}}
+        :jvm-opts ["-Dclojure.tools.logging.factory=clojure.tools.logging.impl/jul-factory"]}
+  
+  :test {:extra-deps {lambdaisland/kaocha {:mvn/version "1.91.1392"}
+                      lambdaisland/kaocha-cloverage {:mvn/version "1.1.89"}}
          :main-opts ["-m" "kaocha.runner"]}
-  :build {:deps {io.github.clojure/tools.build {:mvn/version "0.9.6"}}
-          :ns-default build}}}
+  
+  :uberjar {:replace-deps {com.github.seancorfield/depstar {:mvn/version "2.1.303"}}
+            :exec-fn hf.depstar/uberjar
+            :exec-args {:aot true
+                        :jar "target/liquid-neural-networks.jar"
+                        :main-class liquid-neural-networks.core}}
+  
+  :nrepl {:extra-deps {nrepl/nrepl {:mvn/version "1.3.0"}
+                       cider/cider-nrepl {:mvn/version "0.50.2"}}
+          :main-opts ["-m" "nrepl.cmdline" "--middleware" "[cider.nrepl/cider-middleware]"]}
+  
+  :benchmark {:extra-deps {criterium/criterium {:mvn/version "0.4.6"}
+                           com.clojure-goes-fast/clj-async-profiler {:mvn/version "1.2.2"}}
+              :jvm-opts ["-Djdk.attach.allowAttachSelf"]}}}
