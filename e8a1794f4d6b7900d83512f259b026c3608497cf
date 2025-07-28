@@ -1,0 +1,34 @@
+Context and Details for Source File Implementation
+
+BACKGROUND:
+Generated comprehensive source files through org-mode tangling from SETUP.org.
+Created both basic and research-level implementations in Python and Clojure.
+
+CHANGES MADE:
+1. src/clojure/liquid_neural_networks/core.clj - Full LTC neuron implementation
+2. src/clojure/liquid_neural_networks/applications.clj - Application-specific code
+3. src/python/lnn_research.py - Research framework with JAX, PyTorch, TensorFlow
+4. src/python/lnn_visualization.py - Visualization and analysis tools
+
+TECHNICAL FEATURES:
+- Liquid Time-Constant (LTC) neurons with adaptive time constants
+- Continuous-time dynamics using ODEs
+- Multiple activation functions (sigmoid, tanh, swish, gelu, etc.)
+- JAX-based implementation for high performance
+- PyTorch and TensorFlow backends for compatibility
+- Comprehensive benchmarking and analysis tools
+
+EXPERIMENTS:
+Generated from literate programming approach in SETUP.org allowing:
+- Single source of truth for documentation and code
+- Consistent implementation across languages
+- Reproducible research framework
+
+DEVIATIONS:
+- Some advanced features (like tablecloth integration) disabled due to dependency issues
+- Focused on core LNN functionality rather than full ecosystem integration
+
+FOLLOW-UP:
+- These implementations provide foundation for all applications in APPLICATIONS.org
+- Ready for experimentation with 19-neuron drone navigation and similar tasks
+- Can be extended with specific application code as needed
