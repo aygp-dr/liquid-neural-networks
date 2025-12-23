@@ -1,4 +1,3 @@
-# [[file:../SETUP.org::*FreeBSD System Dependencies][FreeBSD System Dependencies:1]]
 #!/bin/sh
 
 # FreeBSD 14.3 system setup for LNN development
@@ -65,4 +64,3 @@ sudo pkg install -y \
     py39-networkx
 
 echo "✓ FreeBSD base system configured"
-# FreeBSD System Dependencies:1 ends here

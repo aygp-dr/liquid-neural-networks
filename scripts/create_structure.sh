@@ -1,4 +1,3 @@
-# [[file:../SETUP.org::*Project Structure][Project Structure:1]]
 #!/bin/sh
 
 # Create comprehensive project structure
@@ -22,4 +21,3 @@ touch {.gitignore,.github/workflows/ci.yml,Makefile}
 touch {pyproject.toml,setup.py,environment.yml}
 
 echo "✓ Project structure created"
-# Project Structure:1 ends here

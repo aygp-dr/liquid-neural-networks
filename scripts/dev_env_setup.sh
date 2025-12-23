@@ -1,4 +1,3 @@
-# [[file:../SETUP.org::*Development Environment][Development Environment:1]]
 #!/bin/sh
 
 # Development environment setup
@@ -69,4 +68,3 @@ EOF
 pre-commit install
 
 echo "✓ Development environment configured"
-# Development Environment:1 ends here
