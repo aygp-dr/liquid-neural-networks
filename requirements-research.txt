@@ -1,0 +1,38 @@
+# Research requirements for Liquid Neural Networks
+# These are needed for src/python/lnn_research.py
+
+# Core ML frameworks
+jax>=0.4.20
+jaxlib>=0.4.20
+equinox>=0.11.0
+diffrax>=0.5.0
+optax>=0.1.7
+
+# Additional ML frameworks (optional)
+# torch>=2.0.0
+# tensorflow>=2.15.0
+
+# Visualization
+matplotlib>=3.6.0
+seaborn>=0.12.0
+plotly>=5.15.0
+
+# Data processing
+pandas>=2.0.0
+numpy>=1.24.0
+scipy>=1.10.0
+
+# Experiment tracking
+tqdm>=4.65.0
+# wandb>=0.15.0
+# mlflow>=2.8.0
+
+# Hyperparameter optimization
+# optuna>=3.4.0
+
+# Scientific computing
+networkx>=3.1
+scikit-learn>=1.3.0
+
+# Utilities
+PyYAML>=6.0
