@@ -1,7 +1,7 @@
 {:deps
  {org.clojure/clojure {:mvn/version "1.12.0"}
   org.clojure/core.async {:mvn/version "1.6.681"}
-  org.clojure/core.matrix {:mvn/version "0.63.0"}
+  ;; org.clojure/core.matrix {:mvn/version "0.63.0"} ;; deprecated, use net.mikera
   org.clojure/core.match {:mvn/version "1.1.0"}
   org.clojure/data.csv {:mvn/version "1.1.0"}
   org.clojure/data.json {:mvn/version "2.5.0"}
@@ -15,13 +15,14 @@
   
   ;; Scientific computing
   generateme/fastmath {:mvn/version "2.4.0"}
-  scicloj/dtype-next {:mvn/version "10.104.0"}
-  scicloj/tablecloth {:mvn/version "7.029.2"}
-  scicloj/tech.ml {:mvn/version "7.029.2"}
+  ;; scicloj deps commented out - artifacts not found in repos
+  ;; scicloj/dtype-next {:mvn/version "10.104.0"}
+  ;; scicloj/tablecloth {:mvn/version "7.029.2"}
+  ;; scicloj/tech.ml {:mvn/version "7.029.2"}
   
   ;; Visualization
   metasoarous/oz {:mvn/version "2.0.0-alpha5"}
-  scicloj/notespace {:mvn/version "4.0.0-beta7"}
+  ;; scicloj/notespace {:mvn/version "4.0.0-beta7"} ;; FIXME: artifact not found
   
   ;; Web and API
   ring/ring-core {:mvn/version "1.12.2"}
