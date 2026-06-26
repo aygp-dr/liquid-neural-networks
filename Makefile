@@ -3,6 +3,9 @@
 
 .PHONY: help tangle detangle clean-tangled setup-tangle all run-clojure run-python test test-clojure test-python deps install
 
+# Python interpreter (override with: make PYTHON=python3.12 ...)
+PYTHON ?= python3
+
 # Default target
 all: help
 
@@ -97,12 +100,12 @@ run-clojure:
 # Run Python implementation
 run-python:
 	@echo "Running Python LNN implementation..."
-	@cd src && python -m liquid_neural_networks.core
+	@cd src && $(PYTHON) -m liquid_neural_networks.core
 
 # Run research Python implementation
 run-python-research:
 	@echo "Running Python research implementation..."
-	@cd src && python python/lnn_research.py
+	@cd src && $(PYTHON) python/lnn_research.py
 
 # Test targets
 test: test-clojure test-python
@@ -113,13 +116,13 @@ test-clojure:
 
 test-python:
 	@echo "Running Python tests..."
-	@cd src && python -m pytest ../test/ --verbose || echo "No Python tests found or test failures"
+	@$(PYTHON) -m pytest tests/ --verbose || echo "No Python tests found or test failures"
 
 # Basic smoke tests
 smoke-test: tangle
 	@echo "Running smoke tests..."
 	@echo "Testing Python basic import..."
-	@cd src && python -c "from liquid_neural_networks.core import greet; print(greet('Smoke Test'))"
+	@cd src && $(PYTHON) -c "from liquid_neural_networks.core import greet; print(greet('Smoke Test'))"
 	@echo "Testing Clojure basic syntax..."
 	@clojure -e "(println \"Clojure smoke test successful\")"
 	@echo "✓ Smoke tests passed"
