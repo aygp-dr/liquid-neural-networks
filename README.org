@@ -65,6 +65,25 @@ cd liquid-neural-networks
 clojure -M:dev
 #+end_src
 
+*** Clojure development
+
+The Clojure implementation lives in =src/clojure= (tangled from
+[[file:SETUP.org][SETUP.org]]) and follows the aygp-dr Clojure standard:
+=deps.edn= is the canonical manifest and =bb.edn= provides the tasks.
+
+| Task                    | What it does                          |
+|-------------------------+---------------------------------------|
+| =bb test=               | kaocha test suite (=clojure -M:test=) |
+| =bb lint=               | clj-kondo (fails on errors)           |
+| =bb fmt= / =bb fmt:fix= | cljfmt check / fix                    |
+| =bb check=              | lint + fmt + test (CI runs this)      |
+
+Data specs live in =src/clojure/liquid_neural_networks/specs.clj=, and each
+public fn in =liquid-neural-networks.core= has an =s/fdef= right after its
+=defn= (see the [[https://clojure.org/guides/spec][clojure.spec guide]]).
+=test/liquid_neural_networks/specs_test.clj= runs =stest/check= over every
+pure fn, and =clj -M:dev= instruments at the REPL.
+
 ** Basic Usage
 
 *** Python Example
