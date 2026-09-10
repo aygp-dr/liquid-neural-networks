@@ -8,7 +8,8 @@
             [clojure.spec.alpha :as s]
             [clojure.test.check.generators :as gen]
             [fastmath.core :as fm]
-            [fastmath.random :as fr]))
+            [fastmath.random :as fr]
+            [liquid-neural-networks.specs :as specs]))
 
 ;; Configure matrix implementation
 (m/set-current-implementation :vectorz)
@@ -36,16 +37,34 @@
   (let [x (max (min x 500) -500)] ; Clamp to prevent overflow
     (/ 1.0 (+ 1.0 (Math/exp (- x))))))
 
+(s/fdef sigmoid
+  :args (s/cat :x ::specs/activation-input)
+  :ret (s/and double? #(<= 0.0 % 1.0))
+  ;; sigmoid(x) + sigmoid(-x) = 1
+  :fn (fn [{{:keys [x]} :args ret :ret}]
+        (< (Math/abs (- 1.0 (+ ret (sigmoid (- x))))) 1e-9)))
+
 (defn tanh-stable
   "Numerically stable tanh implementation"
   [x]
   (let [x (max (min x 500) -500)]
     (Math/tanh x)))
 
+(s/fdef tanh-stable
+  :args (s/cat :x ::specs/activation-input)
+  :ret (s/and double? #(<= -1.0 % 1.0))
+  ;; tanh is odd
+  :fn (fn [{{:keys [x]} :args ret :ret}]
+        (== ret (- (tanh-stable (- x))))))
+
 (defn relu
   "Rectified Linear Unit"
   [x]
   (max 0.0 x))
+
+(s/fdef relu
+  :args (s/cat :x ::specs/activation-input)
+  :ret (s/and number? (complement neg?)))
 
 (defn leaky-relu
   "Leaky ReLU with configurable slope"
@@ -53,10 +72,24 @@
   ([x alpha]
    (if (pos? x) x (* alpha x))))
 
+(s/fdef leaky-relu
+  :args (s/cat :x ::specs/activation-input :alpha (s/? ::specs/unit-open))
+  :ret number?
+  ;; a positive slope keeps the sign
+  :fn (fn [{{:keys [x]} :args ret :ret}]
+        (= (pos? x) (pos? ret))))
+
 (defn swish
   "Swish activation function"
   [x]
   (* x (sigmoid x)))
+
+(s/fdef swish
+  :args (s/cat :x ::specs/activation-input)
+  :ret number?
+  ;; swish's global minimum is about -0.2785
+  :fn (fn [{ret :ret}]
+        (> ret -0.28)))
 
 (defn gelu
   "Gaussian Error Linear Unit (GELU) approximation"
@@ -64,12 +97,27 @@
   (* 0.5 x (+ 1.0 (Math/tanh (* (Math/sqrt (/ 2.0 Math/PI))
                                 (+ x (* 0.044715 (Math/pow x 3))))))))
 
+(s/fdef gelu
+  :args (s/cat :x ::specs/activation-input)
+  :ret number?
+  ;; GELU's global minimum is about -0.17
+  :fn (fn [{ret :ret}]
+        (> ret -0.18)))
+
 (defn softmax
   "Softmax function for vector"
   [v]
   (let [exp-v (m/emap #(Math/exp (- % (apply max v))) v)
         sum-exp (reduce + exp-v)]
     (m/div exp-v sum-exp)))
+
+(s/fdef softmax
+  :args (s/cat :v ::specs/reals)
+  :ret (s/coll-of double? :kind vector?)
+  ;; a probability distribution over the same number of classes
+  :fn (fn [{{:keys [v]} :args ret :ret}]
+        (and (= (count v) (count ret))
+             (< (Math/abs (- 1.0 (reduce + ret))) 1e-9))))
 
 ;; =============================================================================
 ;; Liquid Time-Constant (LTC) Neuron Implementation
@@ -134,6 +182,10 @@
         combined-input (+ (* weights (first input)) (* bias hidden-state))]
     (activation-fn combined-input)))
 
+(s/fdef compute-f-function
+  :args (s/cat :neuron ::specs/neuron :hidden-state ::specs/real :input ::specs/input-vector)
+  :ret number?)
+
 (defn compute-weight-gradient
   "Compute gradient w.r.t. weights using finite differences"
   [neuron hidden-state input target dt h]
@@ -144,6 +196,10 @@
         pred-minus (forward neuron-minus hidden-state input dt)
         error (- target (forward neuron hidden-state input dt))]
     (* error (/ (- pred-plus pred-minus) (* 2 h)))))
+
+(s/fdef compute-weight-gradient
+  :args ::specs/gradient-args
+  :ret ::specs/finite)
 
 (defn compute-bias-gradient
   "Compute gradient w.r.t. bias using finite differences"
@@ -156,6 +212,10 @@
         error (- target (forward neuron hidden-state input dt))]
     (* error (/ (- pred-plus pred-minus) (* 2 h)))))
 
+(s/fdef compute-bias-gradient
+  :args ::specs/gradient-args
+  :ret ::specs/finite)
+
 (defn compute-tau-gradient
   "Compute gradient w.r.t. tau using finite differences"
   [neuron hidden-state input target dt h]
@@ -167,6 +227,10 @@
         error (- target (forward neuron hidden-state input dt))]
     (* error (/ (- pred-plus pred-minus) (* 2 h)))))
 
+(s/fdef compute-tau-gradient
+  :args ::specs/gradient-args
+  :ret ::specs/finite)
+
 (defn create-ltc-neuron
   "Create a new LTC neuron with specified parameters"
   [id input-size & {:keys [tau A beta activation-fn noise-level learning-rate momentum]
@@ -177,6 +241,11 @@
                (* 0.1 (fr/grand)) ; Small random bias
                tau A beta activation-fn noise-level learning-rate momentum
                0.0 0.0)) ; Initialize gradients
+
+(s/fdef create-ltc-neuron
+  :args (s/cat :id any? :input-size nat-int? :opts ::specs/neuron-opts)
+  :ret ::specs/neuron
+  :fn specs/honours-neuron-opts?)
 
 ;; =============================================================================
 ;; Closed-Form Continuous-Time (CfC) Implementation
@@ -222,6 +291,11 @@
                (* 0.1 (fr/grand))
                tau A beta activation-fn noise-level learning-rate))
 
+(s/fdef create-cfc-neuron
+  :args (s/cat :id any? :input-size nat-int? :opts ::specs/neuron-opts)
+  :ret ::specs/neuron
+  :fn specs/honours-neuron-opts?)
+
 ;; =============================================================================
 ;; Multi-Layer Liquid Neural Network
 ;; =============================================================================
@@ -246,6 +320,12 @@
                        :batch-size 32}]
     (->LiquidNetwork layers connectivity global-params)))
 
+(s/fdef create-liquid-network
+  :args (s/cat :layer-configs ::specs/layer-configs)
+  :ret ::specs/network
+  :fn (fn [{{:keys [layer-configs]} :args ret :ret}]
+        (= (mapv :size layer-configs) (mapv count (:layers ret)))))
+
 (defn create-connectivity-matrix
   "Create connectivity matrix for network layers"
   [layers]
@@ -254,6 +334,13 @@
     ; For now, create simple feed-forward connections
     ; TODO: Implement sparse, recurrent, and custom connectivity patterns
     matrix))
+
+(s/fdef create-connectivity-matrix
+  :args (s/cat :layers (s/coll-of ::specs/layer :kind vector? :min-count 1 :gen-max 3))
+  :ret m/matrix?
+  :fn (fn [{{:keys [layers]} :args ret :ret}]
+        (let [n (reduce + (map count layers))]
+          (= [n n] (vec (m/shape ret))))))
 
 (defn forward-pass
   "Forward pass through the entire network"
@@ -271,6 +358,13 @@
             layers)
     @results))
 
+(s/fdef forward-pass
+  :args (s/cat :network ::specs/network :input ::specs/input-vector :dt ::specs/dt)
+  :ret ::specs/layer-outputs
+  ;; one output per neuron, layer by layer
+  :fn (fn [{{:keys [network]} :args ret :ret}]
+        (= (mapv count (:layers network)) (mapv count ret))))
+
 ;; =============================================================================
 ;; Training and Optimization
 ;; =============================================================================
@@ -286,10 +380,25 @@
     :cross-entropy (- (reduce + (map #(* %1 (Math/log (+ %2 1e-15)))
                                      targets predictions)))))
 
+(s/fdef compute-loss
+  :args ::specs/loss-args
+  :ret ::specs/finite
+  :fn (fn [{{:keys [loss-type]} :args ret :ret}]
+        (or (= :cross-entropy loss-type) (>= ret 0))))
+
 (defn sgd-update
   "Stochastic Gradient Descent parameter update"
   [param gradient learning-rate weight-decay]
   (- param (* learning-rate (+ gradient (* weight-decay param)))))
+
+(s/fdef sgd-update
+  :args (s/cat :param ::specs/real :gradient ::specs/real
+               :learning-rate ::specs/positive :weight-decay ::specs/non-negative)
+  :ret number?
+  ;; no gradient and no decay leaves the parameter alone
+  :fn (fn [{{:keys [param gradient weight-decay]} :args ret :ret}]
+        (or (not (and (zero? gradient) (zero? weight-decay)))
+            (== param ret))))
 
 (defn adam-update
   "Adam optimizer parameter update"
@@ -300,6 +409,13 @@
         v-hat (/ v-new (- 1 (Math/pow beta2 t)))
         param-new (- param (* learning-rate (/ m-hat (+ (Math/sqrt v-hat) epsilon))))]
     {:param param-new :m m-new :v v-new}))
+
+(s/fdef adam-update
+  :args (s/cat :param ::specs/real :gradient ::specs/real :m ::specs/real
+               :v ::specs/non-negative :t (s/int-in 1 1000)
+               :learning-rate ::specs/positive :beta1 ::specs/unit-open
+               :beta2 ::specs/unit-open :epsilon ::specs/step)
+  :ret ::specs/adam-state)
 
 (defn train-network
   "Train the liquid neural network on a dataset"
@@ -324,6 +440,14 @@
             (log/info (format "Epoch %d: Loss = %.6f" epoch avg-loss))))))
     {:network network :losses @losses}))
 
+(s/fdef train-network
+  :args (s/cat :network ::specs/network :training-data ::specs/samples
+               :epochs (s/int-in 0 4) :dt ::specs/dt :opts ::specs/training-opts)
+  :ret ::specs/training-result
+  ;; one loss per epoch
+  :fn (fn [{{:keys [epochs]} :args ret :ret}]
+        (= epochs (count (:losses ret)))))
+
 ;; =============================================================================
 ;; Benchmarking and Analysis
 ;; =============================================================================
@@ -346,6 +470,12 @@
      :avg-error avg-error
      :throughput (/ (count test-data) total-time)
      :results results}))
+
+(s/fdef benchmark-network
+  :args (s/cat :network ::specs/network :test-data ::specs/samples :dt ::specs/dt)
+  :ret ::specs/benchmark-result
+  :fn (fn [{{:keys [test-data]} :args ret :ret}]
+        (= (count test-data) (count (:results ret)))))
 
 (defn analyze-network-dynamics
   "Analyze the dynamical properties of the network"
@@ -380,6 +510,14 @@
      :overall-stability (if (every? #(= (:stability %) :stable) @stability-metrics)
                           :stable :unstable)}))
 
+(s/fdef analyze-network-dynamics
+  :args (s/cat :network ::specs/network
+               :test-inputs (s/coll-of ::specs/input-vector :kind vector? :gen-max 3)
+               :dt ::specs/dt)
+  :ret ::specs/dynamics-result
+  :fn (fn [{{:keys [test-inputs]} :args ret :ret}]
+        (= (count test-inputs) (count (:stability-metrics ret)))))
+
 ;; =============================================================================
 ;; Utility Functions
 ;; =============================================================================
@@ -390,12 +528,20 @@
   (spit filename (pr-str network))
   (log/info (format "Network saved to %s" filename)))
 
+(s/fdef save-network
+  :args (s/cat :network ::specs/network :filename string?)
+  :ret nil?)
+
 (defn load-network
   "Load network from file"
   [filename]
   (let [network (read-string (slurp filename))]
     (log/info (format "Network loaded from %s" filename))
     network))
+
+(s/fdef load-network
+  :args (s/cat :filename string?)
+  :ret any?)
 
 (defn network-summary
   "Generate a summary of the network architecture"
@@ -413,6 +559,12 @@
      :total-parameters total-params
      :connectivity-type "Feed-forward" ; TODO: Make this dynamic
      :global-params (:global-params network)}))
+
+(s/fdef network-summary
+  :args (s/cat :network ::specs/network)
+  :ret ::specs/network-summary
+  :fn (fn [{ret :ret}]
+        (= (:total-neurons ret) (reduce + (:neurons-per-layer ret)))))
 
 (defn -main
   "Main entry point for the application"
@@ -439,3 +591,6 @@
       (log/info "Benchmark results:" benchmark-result))
 
     (log/info "Application completed successfully.")))
+
+(s/fdef -main
+  :args (s/* string?))
