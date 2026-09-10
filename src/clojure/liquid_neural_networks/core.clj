@@ -61,7 +61,7 @@
 (defn gelu
   "Gaussian Error Linear Unit (GELU) approximation"
   [x]
-  (* 0.5 x (+ 1.0 (Math/tanh (* (Math/sqrt (/ 2.0 Math/PI)) 
+  (* 0.5 x (+ 1.0 (Math/tanh (* (Math/sqrt (/ 2.0 Math/PI))
                                 (+ x (* 0.044715 (Math/pow x 3))))))))
 
 (defn softmax
@@ -87,13 +87,13 @@
   (set-params [this params] "Set neuron parameters")
   (reset-state [this] "Reset internal state"))
 
-(defrecord LTCNeuron [id weights bias tau A beta activation-fn 
+(defrecord LTCNeuron [id weights bias tau A beta activation-fn
                       noise-level learning-rate momentum
                       weight-gradients bias-gradients]
   LiquidNeuron
   (forward [this hidden-state input dt]
     (let [f-val (compute-f-function this hidden-state input)
-          noise (when (pos? noise-level) 
+          noise (when (pos? noise-level)
                   (* noise-level (fr/grand)))
           effective-tau (/ tau (+ 1.0 (* beta (Math/abs f-val))))
           decay-term (/ hidden-state effective-tau)
@@ -101,29 +101,29 @@
           derivative (+ (- drive-term decay-term) (or noise 0.0))
           new-state (+ hidden-state (* dt derivative))]
       (max (min new-state 10.0) -10.0))) ; Bounded stability
-  
+
   (backward [this hidden-state input target dt]
     (let [prediction (forward this hidden-state input dt)
           error (- target prediction)
           h 1e-6
-          
+
           ; Compute gradients using finite differences
           weight-grad (compute-weight-gradient this hidden-state input target dt h)
           bias-grad (compute-bias-gradient this hidden-state input target dt h)
           tau-grad (compute-tau-gradient this hidden-state input target dt h)]
-      
+
       {:error error
        :prediction prediction
        :gradients {:weight weight-grad
                    :bias bias-grad
                    :tau tau-grad}}))
-  
+
   (get-params [this]
     {:weights weights :bias bias :tau tau :A A :beta beta})
-  
+
   (set-params [this params]
     (merge this params))
-  
+
   (reset-state [this]
     (assoc this :weight-gradients 0.0 :bias-gradients 0.0)))
 
@@ -170,7 +170,7 @@
 (defn create-ltc-neuron
   "Create a new LTC neuron with specified parameters"
   [id input-size & {:keys [tau A beta activation-fn noise-level learning-rate momentum]
-                    :or {tau 1.0 A 1.0 beta 0.1 activation-fn tanh-stable 
+                    :or {tau 1.0 A 1.0 beta 0.1 activation-fn tanh-stable
                          noise-level 0.0 learning-rate 0.01 momentum 0.9}}]
   (->LTCNeuron id
                (fr/grand) ; Random weight
@@ -182,7 +182,7 @@
 ;; Closed-Form Continuous-Time (CfC) Implementation
 ;; =============================================================================
 
-(defrecord CfCNeuron [id weights bias tau A beta activation-fn 
+(defrecord CfCNeuron [id weights bias tau A beta activation-fn
                       noise-level learning-rate]
   LiquidNeuron
   (forward [this hidden-state input dt]
@@ -190,32 +190,32 @@
           effective-tau (/ tau (+ 1.0 (* beta (Math/abs f-val))))
           decay-factor (Math/exp (- (/ dt effective-tau)))
           target-state (* f-val A)
-          noise (when (pos? noise-level) 
+          noise (when (pos? noise-level)
                   (* noise-level (fr/grand)))
           new-state (+ (* decay-factor hidden-state)
-                      (* (- 1.0 decay-factor) target-state)
-                      (or noise 0.0))]
+                       (* (- 1.0 decay-factor) target-state)
+                       (or noise 0.0))]
       (max (min new-state 10.0) -10.0)))
-  
+
   (backward [this hidden-state input target dt]
     (let [prediction (forward this hidden-state input dt)
           error (- target prediction)]
       {:error error
        :prediction prediction}))
-  
+
   (get-params [this]
     {:weights weights :bias bias :tau tau :A A :beta beta})
-  
+
   (set-params [this params]
     (merge this params))
-  
+
   (reset-state [this]
     this))
 
 (defn create-cfc-neuron
   "Create a new CfC neuron with specified parameters"
   [id input-size & {:keys [tau A beta activation-fn noise-level learning-rate]
-                    :or {tau 1.0 A 1.0 beta 0.1 activation-fn tanh-stable 
+                    :or {tau 1.0 A 1.0 beta 0.1 activation-fn tanh-stable
                          noise-level 0.0 learning-rate 0.01}}]
   (->CfCNeuron id
                (fr/grand)
@@ -232,13 +232,13 @@
   "Create a multi-layer liquid neural network"
   [layer-configs]
   (let [layers (mapv (fn [config]
-                      (let [{:keys [size type neuron-params]} config
-                            neuron-fn (case type
-                                        :ltc create-ltc-neuron
-                                        :cfc create-cfc-neuron)]
-                        (mapv #(apply neuron-fn % 1 (flatten (seq neuron-params)))
-                              (range size))))
-                    layer-configs)
+                       (let [{:keys [size type neuron-params]} config
+                             neuron-fn (case type
+                                         :ltc create-ltc-neuron
+                                         :cfc create-cfc-neuron)]
+                         (mapv #(apply neuron-fn % 1 (flatten (seq neuron-params)))
+                               (range size))))
+                     layer-configs)
         connectivity (create-connectivity-matrix layers)
         global-params {:learning-rate 0.01
                        :momentum 0.9
@@ -262,9 +262,9 @@
         results (atom [])]
     (reduce (fn [current-input layer]
               (let [layer-outputs (mapv (fn [neuron hidden-state]
-                                         (forward neuron hidden-state current-input dt))
-                                       layer
-                                       (or (last @results) (repeat (count layer) 0.0)))]
+                                          (forward neuron hidden-state current-input dt))
+                                        layer
+                                        (or (last @results) (repeat (count layer) 0.0)))]
                 (swap! results conj layer-outputs)
                 layer-outputs))
             input
@@ -284,7 +284,7 @@
     :mae (/ (reduce + (map #(Math/abs (- %1 %2)) predictions targets))
             (count predictions))
     :cross-entropy (- (reduce + (map #(* %1 (Math/log (+ %2 1e-15)))
-                                    targets predictions)))))
+                                     targets predictions)))))
 
 (defn sgd-update
   "Stochastic Gradient Descent parameter update"
@@ -333,11 +333,11 @@
   [network test-data dt]
   (let [start-time (System/nanoTime)
         results (mapv (fn [data]
-                       (let [prediction (forward-pass network (:input data) dt)]
-                         {:prediction prediction
-                          :target (:target data)
-                          :error (compute-loss (last prediction) (:target data) :mse)}))
-                     test-data)
+                        (let [prediction (forward-pass network (:input data) dt)]
+                          {:prediction prediction
+                           :target (:target data)
+                           :error (compute-loss (last prediction) (:target data) :mse)}))
+                      test-data)
         end-time (System/nanoTime)
         total-time (/ (- end-time start-time) 1e9)
         avg-error (/ (reduce + (map :error results)) (count results))]
@@ -362,7 +362,7 @@
             (let [next-state (forward-pass network input dt)]
               (swap! trajectory conj {:time t :state state :input input})
               (recur (+ t dt) (last next-state)))))
-        
+
         ; Analyze stability
         (let [traj @trajectory
               state-norms (map #(Math/sqrt (reduce + (map * (:state %) (:state %)))) traj)
@@ -370,15 +370,15 @@
               min-norm (apply min state-norms)
               stability-score (if (< max-norm 50.0) :stable :unstable)]
           (swap! stability-metrics conj {:input input
-                                        :max-norm max-norm
-                                        :min-norm min-norm
-                                        :stability stability-score})
+                                         :max-norm max-norm
+                                         :min-norm min-norm
+                                         :stability stability-score})
           (swap! trajectory-data conj traj))))
-    
+
     {:stability-metrics @stability-metrics
      :trajectory-data @trajectory-data
      :overall-stability (if (every? #(= (:stability %) :stable) @stability-metrics)
-                         :stable :unstable)}))
+                          :stable :unstable)}))
 
 ;; =============================================================================
 ;; Utility Functions
@@ -403,10 +403,10 @@
   (let [layers (:layers network)
         total-neurons (reduce + (map count layers))
         total-params (reduce + (map (fn [layer]
-                                     (reduce + (map (fn [neuron]
-                                                     (count (get-params neuron)))
-                                                   layer)))
-                                   layers))]
+                                      (reduce + (map (fn [neuron]
+                                                       (count (get-params neuron)))
+                                                     layer)))
+                                    layers))]
     {:total-layers (count layers)
      :neurons-per-layer (mapv count layers)
      :total-neurons total-neurons
@@ -418,7 +418,7 @@
   "Main entry point for the application"
   [& args]
   (log/info "Starting Liquid Neural Networks application...")
-  
+
   ; Example usage
   (let [network-config [{:size 4 :type :ltc :neuron-params {:tau 2.0 :A 1.0}}
                         {:size 2 :type :cfc :neuron-params {:tau 1.5 :A 0.8}}
@@ -426,16 +426,16 @@
         network (create-liquid-network network-config)
         test-input [0.5 0.3 0.8 0.2]
         dt 0.1]
-    
+
     (log/info "Network created:" (network-summary network))
-    
+
     (let [result (forward-pass network test-input dt)]
       (log/info "Forward pass result:" result))
-    
+
     (let [benchmark-data [{:input [0.1 0.2 0.3 0.4] :target [0.5]}
                           {:input [0.2 0.3 0.4 0.5] :target [0.6]}
                           {:input [0.3 0.4 0.5 0.6] :target [0.7]}]
           benchmark-result (benchmark-network network benchmark-data dt)]
       (log/info "Benchmark results:" benchmark-result))
-    
+
     (log/info "Application completed successfully.")))
