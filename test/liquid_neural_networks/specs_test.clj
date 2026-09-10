@@ -16,15 +16,8 @@
     `lnn/load-network   ; reads a file
     `lnn/-main})        ; logs a demo run
 
-;; Real bugs found by stest/check; each is fixed in its own fix: commit.
-;; TODO(spec): (train-network net [{:input [0.1] :target [0.2]}] 1 0.1)
-;;   throws "Divide by zero": fewer samples than :batch-size means no batches.
-(def ^:private known-bugs
-  #{`lnn/train-network})
-
 (defn- checkable []
-  (remove (into side-effecting known-bugs)
-          (stest/enumerate-namespace 'liquid-neural-networks.core)))
+  (remove side-effecting (stest/enumerate-namespace 'liquid-neural-networks.core)))
 
 (deftest fdefs-hold-under-generative-testing
   (let [results (stest/check (checkable) check-opts)]

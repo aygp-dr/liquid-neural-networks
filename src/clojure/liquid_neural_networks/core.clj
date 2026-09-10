@@ -424,7 +424,7 @@
   (let [losses (atom [])]
     (dotimes [epoch epochs]
       (let [epoch-loss (atom 0)
-            batches (partition batch-size training-data)]
+            batches (partition-all batch-size training-data)]
         (doseq [batch batches]
           (let [batch-loss (atom 0)]
             (doseq [{:keys [input target]} batch]
