@@ -17,13 +17,10 @@
     `lnn/-main})        ; logs a demo run
 
 ;; Real bugs found by stest/check; each is fixed in its own fix: commit.
-;; TODO(spec): (forward-pass (create-liquid-network [{:size 1 :type :ltc}
-;;   {:size 2 :type :ltc}]) [0.5] 0.1) returns 1 output for the 2-neuron layer.
 ;; TODO(spec): (train-network net [{:input [0.1] :target [0.2]}] 1 0.1)
 ;;   throws "Divide by zero": fewer samples than :batch-size means no batches.
 (def ^:private known-bugs
-  #{`lnn/forward-pass
-    `lnn/train-network})
+  #{`lnn/train-network})
 
 (defn- checkable []
   (remove (into side-effecting known-bugs)

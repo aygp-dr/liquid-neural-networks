@@ -351,7 +351,7 @@
               (let [layer-outputs (mapv (fn [neuron hidden-state]
                                           (forward neuron hidden-state current-input dt))
                                         layer
-                                        (or (last @results) (repeat (count layer) 0.0)))]
+                                        (take (count layer) (concat (last @results) (repeat 0.0))))]
                 (swap! results conj layer-outputs)
                 layer-outputs))
             input
