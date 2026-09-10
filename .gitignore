@@ -25,8 +25,9 @@ pom.xml.asc
 /.lein-*
 /.nrepl-port
 /.cpcache
-/.clj-kondo
+/.clj-kondo/.cache/
 /.lsp
+.rebel_readline_history
 
 # IDE
 .idea/

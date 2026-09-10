@@ -92,7 +92,7 @@ README.md: README.org
 # Run Clojure implementation
 run-clojure:
 	@echo "Running Clojure LNN implementation..."
-	@cd src/clj && clojure -M -e "(load-file \"liquid_neural_networks/core.clj\") (liquid-neural-networks.core/-main)"
+	@clojure -M -m liquid-neural-networks.core
 
 # Run Python implementation
 run-python:
@@ -109,7 +109,7 @@ test: test-clojure test-python
 
 test-clojure:
 	@echo "Running Clojure tests..."
-	@clojure -M:test || echo "No Clojure tests found or test failures"
+	@bb test
 
 test-python:
 	@echo "Running Python tests..."

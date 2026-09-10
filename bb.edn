@@ -1,0 +1,21 @@
+{:min-bb-version "1.12.0"
+ :tasks
+ {:requires ([babashka.fs :as fs])
+  ;; Clojure lives in src/clojure; src/ also holds the Python package, which
+  ;; clj-kondo and cljfmt skip.
+  :init (def src-dirs (filterv fs/directory? ["src/clojure" "test" "dev"]))
+
+  test    {:doc "Run the test suite on the JVM (clojure -M:test, kaocha)"
+           :task (apply shell "clojure -M:test" *command-line-args*)}
+
+  lint    {:doc "Lint with clj-kondo (fails on errors, reports warnings)"
+           :task (apply shell "clojure -M:lint --fail-level error --lint" src-dirs)}
+
+  fmt     {:doc "Check formatting with cljfmt"
+           :task (apply shell "clojure -M:fmt check" src-dirs)}
+
+  fmt:fix {:doc "Fix formatting with cljfmt"
+           :task (apply shell "clojure -M:fmt fix" src-dirs)}
+
+  check   {:doc "lint + fmt + test (what CI runs)"
+           :depends [lint fmt test]}}}
