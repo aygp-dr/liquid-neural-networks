@@ -7,10 +7,8 @@
             [clojure.tools.logging :as log]
             [clojure.spec.alpha :as s]
             [clojure.test.check.generators :as gen]
-            [criterium.core :as criterium]
             [fastmath.core :as fm]
-            [fastmath.random :as fr]
-            [tablecloth.api :as tc]))
+            [fastmath.random :as fr]))
 
 ;; Configure matrix implementation
 (m/set-current-implementation :vectorz)
@@ -76,6 +74,10 @@
 ;; =============================================================================
 ;; Liquid Time-Constant (LTC) Neuron Implementation
 ;; =============================================================================
+
+;; Defined below; the neuron records and create-liquid-network call them.
+(declare compute-f-function compute-weight-gradient compute-bias-gradient
+         compute-tau-gradient create-connectivity-matrix)
 
 (defprotocol LiquidNeuron
   "Protocol for liquid neuron implementations"
