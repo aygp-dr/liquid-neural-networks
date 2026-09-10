@@ -116,7 +116,7 @@ test-clojure:
 
 test-python:
 	@echo "Running Python tests..."
-	@cd src && python -m pytest ../test/ --verbose || echo "No Python tests found or test failures"
+	@$(PYTHON) -m pytest tests/ --verbose || echo "No Python tests found or test failures"
 
 # Basic smoke tests
 smoke-test: tangle
