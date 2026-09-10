@@ -2,8 +2,8 @@
   "Real-world applications of Liquid Neural Networks"
   (:require [liquid-neural-networks.core :as lnn]
             [clojure.core.matrix :as m]
+            [clojure.core.matrix.stats :as ms]
             [clojure.tools.logging :as log]
-            [tablecloth.api :as tc]
             [fastmath.random :as fr]))
 
 ;; =============================================================================
@@ -191,7 +191,7 @@
   [price-data volume-data indicators]
   (let [returns (mapv (fn [p1 p2] (/ (- p2 p1) p1))
                      price-data (rest price-data))
-        volatility (lnn/ms/variance returns)
+        volatility (ms/variance returns)
         moving-avg (/ (reduce + (take-last 10 price-data)) 10)
         volume-avg (/ (reduce + (take-last 10 volume-data)) 10)]
     (concat returns [volatility moving-avg volume-avg] indicators)))
