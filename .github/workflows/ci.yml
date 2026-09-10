@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [ main ]
 
+permissions:
+  contents: read
+
 jobs:
   test-python:
     runs-on: ubuntu-latest
@@ -53,7 +56,7 @@ jobs:
         with:
           distribution: temurin
           java-version: '21'
-      - uses: DeLaGuardo/setup-clojure@13.7.0
+      - uses: DeLaGuardo/setup-clojure@6d46099eae24853c33c0482f2bb54edf4f1a4c74 # 13.7.0
         with:
           cli: latest
           bb: latest
