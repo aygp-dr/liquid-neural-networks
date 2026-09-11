@@ -29,7 +29,7 @@ jobs:
         
     - name: Install dependencies
       run: |
-        uv pip install numpy scipy matplotlib pytest black ruff
+        uv pip install --system numpy scipy matplotlib pytest black ruff
         # Skip heavy ML dependencies for CI
         
     - name: Lint with ruff
@@ -95,7 +95,7 @@ jobs:
     - name: Install uv and basic dependencies
       run: |
         pip install uv
-        uv pip install numpy scipy matplotlib
+        uv pip install --system numpy scipy matplotlib
         
     - name: Run smoke tests
       run: |
