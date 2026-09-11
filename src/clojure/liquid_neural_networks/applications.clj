@@ -2,16 +2,16 @@
   "Real-world applications of Liquid Neural Networks"
   (:require [liquid-neural-networks.core :as lnn]
             [clojure.core.matrix :as m]
+            [clojure.core.matrix.stats :as ms]
             [clojure.tools.logging :as log]
-            [tablecloth.api :as tc]
             [fastmath.random :as fr]))
 
 ;; =============================================================================
 ;; Autonomous Systems Application
 ;; =============================================================================
 
-(defrecord AutonomousController [lnn sensor-config actuator-config 
-                                control-history decision-threshold])
+(defrecord AutonomousController [lnn sensor-config actuator-config
+                                 control-history decision-threshold])
 
 (defn create-autonomous-controller
   "Create an autonomous control system using LNN"
@@ -21,12 +21,12 @@
                         {:size actuator-count :type :ltc :neuron-params {:tau 1.0 :A 1.0}}]
         network (lnn/create-liquid-network network-config)]
     (->AutonomousController network
-                           {:sensor-count sensor-count
-                            :sensor-types [:distance :speed :angle :obstacle]}
-                           {:actuator-count actuator-count
-                            :actuator-types [:steering :throttle]}
-                           []
-                           0.5)))
+                            {:sensor-count sensor-count
+                             :sensor-types [:distance :speed :angle :obstacle]}
+                            {:actuator-count actuator-count
+                             :actuator-types [:steering :throttle]}
+                            []
+                            0.5)))
 
 (defn process-sensor-data
   "Process sensor data and generate control commands"
@@ -34,12 +34,12 @@
   (let [normalized-data (mapv #(/ % 255.0) sensor-data)
         control-output (lnn/forward-pass (:lnn controller) normalized-data dt)
         decision (if (> (first (last control-output)) (:decision-threshold controller))
-                  :action-required
-                  :maintain-state)
+                   :action-required
+                   :maintain-state)
         control-command {:timestamp (System/currentTimeMillis)
-                        :sensor-data sensor-data
-                        :control-output (last control-output)
-                        :decision decision}]
+                         :sensor-data sensor-data
+                         :control-output (last control-output)
+                         :decision decision}]
     (-> controller
         (update :control-history conj control-command))))
 
@@ -48,7 +48,7 @@
 ;; =============================================================================
 
 (defrecord TimeSeriesPredictor [lnn lookback-window prediction-horizon
-                               normalization-params])
+                                normalization-params])
 
 (defn create-time-series-predictor
   "Create a time series forecasting system"
@@ -64,7 +64,7 @@
   [data]
   (let [mean-val (/ (reduce + data) (count data))
         std-val (Math/sqrt (/ (reduce + (map #(Math/pow (- % mean-val) 2) data))
-                             (count data)))]
+                              (count data)))]
     {:normalized (mapv #(/ (- % mean-val) std-val) data)
      :mean mean-val
      :std std-val}))
@@ -84,10 +84,10 @@
     (doseq [sequence sequences]
       (let [prediction (lnn/forward-pass (:lnn predictor) (vec sequence) dt)]
         (swap! predictions conj (last prediction))))
-    
-    {:predictions (denormalize-predictions @predictions 
-                                          (:mean norm-result)
-                                          (:std norm-result))
+
+    {:predictions (denormalize-predictions @predictions
+                                           (:mean norm-result)
+                                           (:std norm-result))
      :normalization-params norm-result}))
 
 ;; =============================================================================
@@ -95,7 +95,7 @@
 ;; =============================================================================
 
 (defrecord MedicalDiagnosisSystem [lnn symptom-encoder diagnosis-decoder
-                                  confidence-threshold])
+                                   confidence-threshold])
 
 (defn create-medical-diagnosis-system
   "Create a medical diagnosis system using LNN"
@@ -117,7 +117,7 @@
   [output diagnosis-mapping]
   (let [probs (lnn/softmax output)]
     (mapv (fn [prob diagnosis]
-           {:diagnosis diagnosis :probability prob})
+            {:diagnosis diagnosis :probability prob})
           probs diagnosis-mapping)))
 
 (defn diagnose-patient
@@ -127,7 +127,7 @@
         output (lnn/forward-pass (:lnn system) encoded-symptoms dt)
         diagnosis-probs (decode-diagnosis (last output) (:diagnosis-decoder system))
         high-confidence (filter #(> (:probability %) (:confidence-threshold system))
-                               diagnosis-probs)]
+                                diagnosis-probs)]
     {:all-diagnoses diagnosis-probs
      :high-confidence-diagnoses high-confidence
      :timestamp (System/currentTimeMillis)}))
@@ -147,11 +147,11 @@
                         {:size joint-count :type :cfc :neuron-params {:tau 0.8 :A 1.0}}]
         network (lnn/create-liquid-network network-config)]
     (->RobotController network
-                      {:joint-count joint-count
-                       :joint-limits [[-180 180] [-90 90] [-180 180]]} ; Example limits
-                      {:sensor-count sensor-count
-                       :sensor-types [:position :velocity :force :torque]}
-                      {})))
+                       {:joint-count joint-count
+                        :joint-limits [[-180 180] [-90 90] [-180 180]]} ; Example limits
+                       {:sensor-count sensor-count
+                        :sensor-types [:position :velocity :force :torque]}
+                       {})))
 
 (defn compute-joint-commands
   "Compute joint commands for robot"
@@ -159,11 +159,11 @@
   (let [state-vector (concat sensor-data target-pose)
         joint-outputs (lnn/forward-pass (:lnn controller) state-vector dt)
         joint-commands (mapv (fn [output joint-limits]
-                              (let [[min-val max-val] joint-limits
-                                    scaled-output (+ min-val (* (+ output 1.0) 0.5 (- max-val min-val)))]
-                                (max min-val (min max-val scaled-output))))
-                            (last joint-outputs)
-                            (get-in controller [:joint-config :joint-limits]))]
+                               (let [[min-val max-val] joint-limits
+                                     scaled-output (+ min-val (* (+ output 1.0) 0.5 (- max-val min-val)))]
+                                 (max min-val (min max-val scaled-output))))
+                             (last joint-outputs)
+                             (get-in controller [:joint-config :joint-limits]))]
     {:joint-commands joint-commands
      :timestamp (System/currentTimeMillis)
      :sensor-data sensor-data
@@ -174,7 +174,7 @@
 ;; =============================================================================
 
 (defrecord FinancialPredictor [lnn feature-extractors risk-assessor
-                              market-indicators])
+                               market-indicators])
 
 (defn create-financial-predictor
   "Create a financial forecasting system"
@@ -190,8 +190,8 @@
   "Extract features from financial data"
   [price-data volume-data indicators]
   (let [returns (mapv (fn [p1 p2] (/ (- p2 p1) p1))
-                     price-data (rest price-data))
-        volatility (lnn/ms/variance returns)
+                      price-data (rest price-data))
+        volatility (ms/variance returns)
         moving-avg (/ (reduce + (take-last 10 price-data)) 10)
         volume-avg (/ (reduce + (take-last 10 volume-data)) 10)]
     (concat returns [volatility moving-avg volume-avg] indicators)))
@@ -200,8 +200,8 @@
   "Predict financial market movement"
   [predictor market-data dt]
   (let [features (extract-financial-features (:prices market-data)
-                                           (:volumes market-data)
-                                           (:indicators market-data))
+                                             (:volumes market-data)
+                                             (:indicators market-data))
         predictions (lnn/forward-pass (:lnn predictor) features dt)
         movement-probs (lnn/softmax (last predictions))
         direction (if (> (first movement-probs) 0.5) :up :down)
@@ -221,15 +221,15 @@
   [app-type config]
   (case app-type
     :autonomous-control (create-autonomous-controller (:sensor-count config)
-                                                    (:actuator-count config))
+                                                      (:actuator-count config))
     :time-series (create-time-series-predictor (:lookback-window config)
-                                             (:prediction-horizon config))
+                                               (:prediction-horizon config))
     :medical-diagnosis (create-medical-diagnosis-system (:symptom-count config)
-                                                      (:diagnosis-count config))
+                                                        (:diagnosis-count config))
     :robot-control (create-robot-controller (:joint-count config)
-                                          (:sensor-count config))
+                                            (:sensor-count config))
     :financial-forecasting (create-financial-predictor (:feature-count config)
-                                                      (:prediction-horizon config))
+                                                       (:prediction-horizon config))
     (throw (ex-info "Unknown application type" {:type app-type}))))
 
 (defn benchmark-application
@@ -239,21 +239,21 @@
         results (case (type app)
                   AutonomousController
                   (mapv #(process-sensor-data app (:sensor-data %) dt) test-data)
-                  
+
                   TimeSeriesPredictor
                   (mapv #(predict-time-series app (:time-series %) dt) test-data)
-                  
+
                   MedicalDiagnosisSystem
                   (mapv #(diagnose-patient app (:symptoms %) dt) test-data)
-                  
+
                   RobotController
                   (mapv #(compute-joint-commands app (:sensor-data %) (:target-pose %) dt) test-data)
-                  
+
                   FinancialPredictor
                   (mapv #(predict-financial-movement app (:market-data %) dt) test-data))
         end-time (System/nanoTime)
         total-time (/ (- end-time start-time) 1e9)]
-    
+
     {:total-time total-time
      :avg-time-per-sample (/ total-time (count test-data))
      :throughput (/ (count test-data) total-time)

@@ -6,12 +6,15 @@ on:
   pull_request:
     branches: [ main ]
 
+permissions:
+  contents: read
+
 jobs:
   test-python:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.9, 3.10, 3.11]
+        python-version: ['3.9', '3.10', '3.11']
     
     steps:
     - uses: actions/checkout@v4
@@ -26,7 +29,7 @@ jobs:
         
     - name: Install dependencies
       run: |
-        uv pip install numpy scipy matplotlib pytest black ruff
+        uv pip install --system numpy scipy matplotlib pytest black ruff
         # Skip heavy ML dependencies for CI
         
     - name: Lint with ruff
@@ -45,34 +48,30 @@ jobs:
       run: |
         make test-python
 
-  test-clojure:
+  check:
     runs-on: ubuntu-latest
-    
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Set up Java
-      uses: actions/setup-java@v3
-      with:
-        distribution: 'temurin'
-        java-version: '11'
-        
-    - name: Install Clojure CLI
-      uses: DeLaGuardo/setup-clojure@12.1
-      with:
-        cli: latest
-        
-    - name: Test Clojure implementation
-      run: |
-        make run-clojure
-        
-    - name: Run Clojure tests
-      run: |
-        make test-clojure
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: DeLaGuardo/setup-clojure@6d46099eae24853c33c0482f2bb54edf4f1a4c74 # 13.7.0
+        with:
+          cli: latest
+          bb: latest
+      - uses: actions/cache@v6
+        with:
+          path: |
+            ~/.m2/repository
+            ~/.gitlibs
+          key: clj-${{ runner.os }}-${{ hashFiles('**/deps.edn', '**/bb.edn') }}
+          restore-keys: clj-${{ runner.os }}-
+      - run: bb check
 
   smoke-test:
     runs-on: ubuntu-latest
-    needs: [test-python, test-clojure]
+    needs: [test-python, check]
     
     steps:
     - uses: actions/checkout@v4
@@ -96,7 +95,7 @@ jobs:
     - name: Install uv and basic dependencies
       run: |
         pip install uv
-        uv pip install numpy scipy matplotlib
+        uv pip install --system numpy scipy matplotlib
         
     - name: Run smoke tests
       run: |

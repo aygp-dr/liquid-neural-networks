@@ -435,10 +435,8 @@ ray[rllib]>=2.8.0
             [clojure.tools.logging :as log]
             [clojure.spec.alpha :as s]
             [clojure.test.check.generators :as gen]
-            [criterium.core :as criterium]
             [fastmath.core :as fm]
-            [fastmath.random :as fr]
-            [tablecloth.api :as tc]))
+            [fastmath.random :as fr]))
 
 ;; Configure matrix implementation
 (m/set-current-implementation :vectorz)
@@ -504,6 +502,10 @@ ray[rllib]>=2.8.0
 ;; =============================================================================
 ;; Liquid Time-Constant (LTC) Neuron Implementation
 ;; =============================================================================
+
+;; Defined below; the neuron records and create-liquid-network call them.
+(declare compute-f-function compute-weight-gradient compute-bias-gradient
+         compute-tau-gradient create-connectivity-matrix)
 
 (defprotocol LiquidNeuron
   "Protocol for liquid neuron implementations"
@@ -690,7 +692,7 @@ ray[rllib]>=2.8.0
               (let [layer-outputs (mapv (fn [neuron hidden-state]
                                          (forward neuron hidden-state current-input dt))
                                        layer
-                                       (or (last @results) (repeat (count layer) 0.0)))]
+                                       (take (count layer) (concat (last @results) (repeat 0.0))))]
                 (swap! results conj layer-outputs)
                 layer-outputs))
             input
@@ -734,7 +736,7 @@ ray[rllib]>=2.8.0
   (let [losses (atom [])]
     (dotimes [epoch epochs]
       (let [epoch-loss (atom 0)
-            batches (partition batch-size training-data)]
+            batches (partition-all batch-size training-data)]
         (doseq [batch batches]
           (let [batch-loss (atom 0)]
             (doseq [{:keys [input target]} batch]
@@ -874,8 +876,8 @@ ray[rllib]>=2.8.0
   "Real-world applications of Liquid Neural Networks"
   (:require [liquid-neural-networks.core :as lnn]
             [clojure.core.matrix :as m]
+            [clojure.core.matrix.stats :as ms]
             [clojure.tools.logging :as log]
-            [tablecloth.api :as tc]
             [fastmath.random :as fr]))
 
 ;; =============================================================================
@@ -1063,7 +1065,7 @@ ray[rllib]>=2.8.0
   [price-data volume-data indicators]
   (let [returns (mapv (fn [p1 p2] (/ (- p2 p1) p1))
                      price-data (rest price-data))
-        volatility (lnn/ms/variance returns)
+        volatility (ms/variance returns)
         moving-avg (/ (reduce + (take-last 10 price-data)) 10)
         volume-avg (/ (reduce + (take-last 10 volume-data)) 10)]
     (concat returns [volatility moving-avg volume-avg] indicators)))
